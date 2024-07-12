@@ -1,59 +1,61 @@
 import Head from 'next/head'
 import Link from 'next/link';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
 import Layout from '@components/Layout';
 import Container from '@components/Container';
 import Button from '@components/Button';
 
-import products from '@data/products';
-
 import styles from '@styles/Page.module.scss'
 
-export default function Home() {
+export default function Home({ homePage, products }) {
+  console.log(homePage);
+  console.log(products);
+  const { heroTitle, heroText, heroLink, heroBackground } = homePage;
   return (
     <Layout>
       <Head>
-        <title>Space Jelly Gear</title>
-        <meta name="description" content="Get your Space Jelly gear!" />
+        <title>Tiny Store</title>
+        <meta name="description" content="Get your Tiny Store!" />
       </Head>
 
       <Container>
-        <h1 className="sr-only">Space Jelly Gear</h1>
+        <h1 className="sr-only">Tiny Store</h1>
 
         <div className={styles.hero}>
-          <Link href="#">
+          <Link href={heroLink}>
             <a>
               <div className={styles.heroContent}>
-                <h2>Prepare for liftoff.</h2>
-                <p>Apparel that&apos;s out of this world!</p>
+                <h2>{heroTitle}</h2>
+                <p>{heroText}</p>
               </div>
-              <img className={styles.heroImage} src="/images/space-jelly-gear-banner.jpg" alt="" />
+              <img className={styles.heroImage} width={heroBackground.width} height={heroBackground.height} src={heroBackground.url} alt="" />
             </a>
           </Link>
         </div>
 
-        <h2 className={styles.heading}>Featured Gear</h2>
+        <h2 className={styles.heading}>Articles vedettes</h2>
 
         <ul className={styles.products}>
           {products.slice(0, 4).map(product => {
             return (
-              <li key={product.id}>
+              <li key={product.slug}>
                 <Link href="#">
                   <a>
                     <div className={styles.productImage}>
-                      <img width="500" height="500" src={product.image} alt="" />
+                      <img width={product.width} height={product.height} src={product.image.url} alt={product.slug} />
                     </div>
                     <h3 className={styles.productTitle}>
                       { product.name }
                     </h3>
                     <p className={styles.productPrice}>
-                      ${ product.price }
+                      { product.price } XAF
                     </p>
                   </a>
                 </Link>
                 <p>
                   <Button>
-                    Add to Cart
+                    Ajouter au panier
                   </Button>
                 </p>
               </li>
@@ -63,4 +65,52 @@ export default function Home() {
       </Container>
     </Layout>
   )
+}
+
+export async function getStaticProps() {
+  const client = new ApolloClient({
+    uri: 'https://us-east-1-shared-usea1-02.cdn.hygraph.com/content/clyhyneju013107ti6bka6y62/master',
+    cache: new InMemoryCache()
+  });
+
+  const {data} = await client.query({
+    query: gql`
+      query HomePage {
+        page(where: {slug: "accueil"}) {
+          id
+          heroLink
+          heroText
+          heroTitle
+          name
+          slug
+          heroBackground {
+            height
+            url
+            width
+          }
+        }
+        
+        products(first: 4) {
+          id
+          name
+          price
+          slug
+          image {
+            height
+            url
+            width
+          }
+        }
+      }
+    `
+  });
+  console.log(data);
+  const homePage = data.page;
+  const products = data.products
+  return {
+    props: {
+      homePage,
+      products
+    }
+  }
 }

@@ -1,9 +1,9 @@
-# Space Jelly Gear Starter
+# Tiny Store Starter
 
 ## ⚡️ Quick Start
 
 ```bash
-yarn create next-app -e https://github.com/colbyfayock/space-jelly-gear-starter
+yarn create next-app -e https://github.com/Jk3ndo/nextjs-hygraph-ecommerce
 # or
-npx create-next-app -e https://github.com/colbyfayock/space-jelly-gear-starter
+npx create-next-app -e https://github.com/Jk3ndo/nextjs-hygraph-ecommerce
 ```

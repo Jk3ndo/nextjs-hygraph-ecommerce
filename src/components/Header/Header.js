@@ -11,7 +11,7 @@ const Header = () => {
       <Container className={styles.headerContainer}>
         <p className={styles.headerTitle}>
           <Link href="/">
-            <a>Space Jelly</a>
+            <a>Tiny Store</a>
           </Link>
         </p>
         <ul className={styles.headerLinks}>
@@ -43,7 +43,7 @@ const Header = () => {
           <li>
             <Link href="#">
               <a>
-                ES
+                DK
               </a>
             </Link>
           </li>
