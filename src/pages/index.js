@@ -40,7 +40,7 @@ export default function Home({ homePage, products }) {
           {products.slice(0, 4).map(product => {
             return (
               <li key={product.slug}>
-                <Link href="#">
+                <Link href={`/products/${product.slug}`}>
                   <a>
                     <div className={styles.productImage}>
                       <img width={product.width} height={product.height} src={product.image.url} alt={product.slug} />
@@ -83,11 +83,7 @@ export async function getStaticProps() {
           heroTitle
           name
           slug
-          heroBackground {
-            height
-            url
-            width
-          }
+          heroBackground
         }
         
         products(first: 4) {
@@ -95,11 +91,7 @@ export async function getStaticProps() {
           name
           price
           slug
-          image {
-            height
-            url
-            width
-          }
+          image
         }
       }
     `
