@@ -54,7 +54,12 @@ export default function Home({ homePage, products }) {
                   </a>
                 </Link>
                 <p>
-                  <Button>
+                  <Button className="snipcart-add-item"
+                    data-item-id={product.id}
+                    data-item-price={product.price}
+                    data-item-url={`/products/${product.slug}`}
+                    data-item-image={product.image.url}
+                    data-item-name={product.name}>
                     Ajouter au panier
                   </Button>
                 </p>
