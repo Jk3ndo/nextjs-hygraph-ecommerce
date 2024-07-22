@@ -27,7 +27,6 @@ export default function Category({ category, products}) {
             return (
               <li key={product.slug}>
                 <Link href={`/products/${product.slug}`}>
-                  <a>
                     <div className={styles.productImage}>
                       <img width="900" height="900" src={imageUrl} alt={product.slug} />
                     </div>
@@ -37,7 +36,6 @@ export default function Category({ category, products}) {
                     <p className={styles.productPrice}>
                       { product.price } XAF
                     </p>
-                  </a>
                 </Link>
                 <p>
                   <Button className="snipcart-add-item"

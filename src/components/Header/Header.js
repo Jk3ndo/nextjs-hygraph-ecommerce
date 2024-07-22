@@ -16,23 +16,23 @@ const Header = () => {
       <Container className={styles.headerContainer}>
         <p className={styles.headerTitle}>
           <Link href="/">
-            <a>Tiny Store</a>
+            Tiny Store
           </Link>
         </p>
         <ul className={styles.headerLinks}>
           <li>
             <Link href="/categories/vetement">
-              <a>Vêtements</a>
+              Vêtements
             </Link>
           </li>
           <li>
             <Link href="/categories/accessoires">
-              <a>Accessoires</a>
+              Accessoires
             </Link>
           </li>
           <li>
             <Link href="/stores">
-              <a>Find a store</a>
+              Find a store
             </Link>
           </li>
         </ul>
@@ -50,9 +50,7 @@ const Header = () => {
               <>
                 <li key={locale}>
                   <Link href={asPath} locale={locale}>
-                    <a>
                       {locale.toUpperCase()}
-                    </a>
                   </Link>
                 </li>
               </>

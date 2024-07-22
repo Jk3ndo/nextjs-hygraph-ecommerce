@@ -24,13 +24,11 @@ export default function Home({ homePage, products }) {
 
         <div className={styles.hero}>
           <Link href={heroLink}>
-            <a>
               <div className={styles.heroContent}>
                 <h2>{heroTitle}</h2>
                 <p>{heroText}</p>
               </div>
               <img className={styles.heroImage} width={heroBackground.width} height={heroBackground.height} src={buildImage(heroBackground.public_id).toURL()} alt="" />
-            </a>
           </Link>
         </div>
 
@@ -42,7 +40,6 @@ export default function Home({ homePage, products }) {
             return (
               <li key={product.slug}>
                 <Link href={`/products/${product.slug}`}>
-                  <a>
                     <div className={styles.productImage}>
                       <img width={product.width} height={product.height} src={imageUrl} alt={product.slug} />
                     </div>
@@ -52,7 +49,6 @@ export default function Home({ homePage, products }) {
                     <p className={styles.productPrice}>
                       { product.price } XAF
                     </p>
-                  </a>
                 </Link>
                 <p>
                   <Button className="snipcart-add-item"
