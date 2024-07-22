@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
-
+import { buildImage } from '@lib/cloudinary';
 import Layout from '@components/Layout';
 import Container from '@components/Container';
 import Button from '@components/Button';
@@ -29,7 +29,7 @@ export default function Home({ homePage, products }) {
                 <h2>{heroTitle}</h2>
                 <p>{heroText}</p>
               </div>
-              <img className={styles.heroImage} width={heroBackground.width} height={heroBackground.height} src={heroBackground.url} alt="" />
+              <img className={styles.heroImage} width={heroBackground.width} height={heroBackground.height} src={buildImage(heroBackground.public_id).toURL()} alt="" />
             </a>
           </Link>
         </div>
@@ -38,12 +38,13 @@ export default function Home({ homePage, products }) {
 
         <ul className={styles.products}>
           {products.slice(0, 4).map(product => {
+            const imageUrl = buildImage(product.image.public_id).resize('w_900,h_900').toURL();
             return (
               <li key={product.slug}>
                 <Link href={`/products/${product.slug}`}>
                   <a>
                     <div className={styles.productImage}>
-                      <img width={product.width} height={product.height} src={product.image.url} alt={product.slug} />
+                      <img width={product.width} height={product.height} src={imageUrl} alt={product.slug} />
                     </div>
                     <h3 className={styles.productTitle}>
                       { product.name }
@@ -72,7 +73,8 @@ export default function Home({ homePage, products }) {
   )
 }
 
-export async function getStaticProps() {
+export async function getStaticProps({locale}) {
+  console.log(locale)
   const client = new ApolloClient({
     uri: 'https://us-east-1-shared-usea1-02.cdn.hygraph.com/content/clyhyneju013107ti6bka6y62/master',
     cache: new InMemoryCache()
@@ -80,7 +82,7 @@ export async function getStaticProps() {
 
   const {data} = await client.query({
     query: gql`
-      query HomePage {
+      query HomePage($locale: Locale!) {
         page(where: {slug: "accueil"}) {
           id
           heroLink
@@ -89,6 +91,11 @@ export async function getStaticProps() {
           name
           slug
           heroBackground
+          localizations(locales: [$locale]) {
+            heroText
+            heroTitle
+            locale
+          }
         }
         
         products(where: {category_some: {slug: "featured"}}) {
@@ -99,10 +106,20 @@ export async function getStaticProps() {
           slug
         }
       }
-    `
+    `,
+    variables: {
+      locale
+    }
   });
   console.log(data);
-  const homePage = data.page;
+  let homePage = data.page;
+
+  if (homePage.localizations.length > 0) {
+    homePage = {
+      ...homePage,
+      ...homePage.localizations[0]
+    }
+  }
   const products = data.products
   return {
     props: {

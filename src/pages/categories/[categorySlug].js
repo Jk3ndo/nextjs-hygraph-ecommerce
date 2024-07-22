@@ -3,9 +3,10 @@ import Layout from '@components/Layout';
 import Container from '@components/Container';
 import Button from '@components/Button';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
-
+import { buildImage } from '@lib/cloudinary';
 import styles from '@styles/Page.module.scss'
 import Link from 'next/link';
+
 
 export default function Category({ category, products}) {
   return (
@@ -22,12 +23,13 @@ export default function Category({ category, products}) {
 
         <ul className={styles.products}>
           {products.map(product => {
+            const imageUrl = buildImage(product.image.public_id).resize('w_900,h_900').toURL();
             return (
               <li key={product.slug}>
                 <Link href={`/products/${product.slug}`}>
                   <a>
                     <div className={styles.productImage}>
-                      <img width={product.width} height={product.height} src={product.image.url} alt={product.slug} />
+                      <img width="900" height="900" src={imageUrl} alt={product.slug} />
                     </div>
                     <h3 className={styles.productTitle}>
                       { product.name }
@@ -93,7 +95,7 @@ export async function getStaticProps({ params }) {
   }
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths({locales}) {
   const client = new ApolloClient({
     uri: 'https://us-east-1-shared-usea1-02.cdn.hygraph.com/content/clyhyneju013107ti6bka6y62/master',
     cache: new InMemoryCache()
@@ -119,7 +121,17 @@ export async function getStaticPaths() {
   })
   console.log(paths)
   return {
-    paths,
+    paths: [
+      ...paths,
+      ...paths.flatMap(path => {
+        return locales.map(locale => {
+          return {
+            ...path,
+            locale
+          }
+        })
+      })
+    ],
     fallback: false
   }
 }

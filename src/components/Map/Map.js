@@ -6,11 +6,11 @@ import iconMarker2x from 'leaflet/dist/images/marker-icon-2x.png';
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
 import iconMarkerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useEffect } from "react";
+import { UseMapInstance } from "./useMapInstance";
 
-const position = [51.505, -0.09];
-const { MapContainer, MapConsumer } = ReactLeaflet;
+const { MapContainer, TileLayer, Marker, Popup } = ReactLeaflet;
 
-const Map = ({ children, className }) =>  {
+const Map = ({ className, center, positions, zoom }) =>  {
 
     let mapClassName = styles.map;
     if (mapClassName) {
@@ -24,13 +24,25 @@ const Map = ({ children, className }) =>  {
         iconUrl: iconMarker.src,
         shadowUrl: iconMarkerShadow.src
         })
-    }, [])
+    }, []);
 
     return (
-        <MapContainer className={mapClassName} center={position} zoom={13} scrollWheelZoom={false}>
-            <MapConsumer>
-                { (map) => children(ReactLeaflet, map) }
-            </MapConsumer>
+        <MapContainer className={mapClassName} center={center} scrollWheelZoom={false}>
+            <UseMapInstance position={center} zoom={zoom}  />
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            { positions.map(position => {
+                return (
+                    <Marker position={[position.location.latitude, position.location.longitude]} key={`pos-${position.location.latitude}`}>
+                        <Popup>
+                            <p>{position.name}</p>
+                            <p>{position.address}</p>
+                        </Popup>
+                    </Marker>
+                )
+            })}
         </MapContainer>
     )
 }

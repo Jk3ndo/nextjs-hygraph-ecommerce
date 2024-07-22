@@ -1,14 +1,24 @@
 import Head from 'next/head'
 import { FaExternalLinkAlt } from 'react-icons/fa';
-
+import { useState } from 'react';
 import Layout from '@components/Layout';
 import Container from '@components/Container';
 import Map from '@components/Map';
 
 import styles from '@styles/Page.module.scss';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import center from '@turf/center';
+import { points } from '@turf/helpers';
 
 export default function Stores({ storeLocations }) {
+  const positions = [];
+  const features = points(storeLocations.map(({location}) => {
+    return [location.latitude, location.longitude]
+  }));
+  const [defaultLatitude, defaultLongitude] = center(features)?.geometry.coordinates;
+  const [activeStore, setActiveStore] = useState([defaultLatitude, defaultLongitude]);
+  const [zoom, setZoom] = useState(7);
+
   return (
     <Layout>
       <Head>
@@ -24,6 +34,13 @@ export default function Stores({ storeLocations }) {
           <div className={styles.storesLocations}>
             <ul className={styles.locations}>
               { storeLocations.map(store => {
+                positions.push({location: store.location, name: store.name, address: store.address, id: store.id});
+                
+                function handleOnClick() {
+                  setActiveStore([store.location.latitude, store.location.longitude]);
+                  setZoom(15);
+                }
+
                 return (
                   <li key={store.id}>
                     <p className={styles.locationName}>
@@ -36,7 +53,7 @@ export default function Stores({ storeLocations }) {
                       {store.phoneNumber}
                     </p>
                     <p className={styles.locationDiscovery}>
-                      <button>
+                      <button onClick={handleOnClick}>
                         View on Map
                       </button>
                       <a href={`https://www.google.com/maps/dir//${store.location.latitude},${store.location.longitude}/@${store.location.latitude},${store.location.longitude},17z/`} target="_blank" rel="noreferrer">
@@ -52,24 +69,7 @@ export default function Stores({ storeLocations }) {
 
           <div className={styles.storesMap}>
             <div className={styles.storesMapContainer}>
-                <Map className={styles.map}>
-                  {({TileLayer, Marker, Popup}, map) => {
-                    const position = [51.505, -0.09];
-                    return (
-                      <>
-                        <TileLayer
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Marker position={position}>
-                          <Popup>
-                            A pretty CSS3 popup. <br /> Easily customizable.
-                          </Popup>
-                        </Marker>
-                      </>
-                    );
-                  } }
-                </Map>
+                <Map className={styles.map} center={activeStore} positions={positions} zoom={zoom} />
             </div>
           </div>
         </div>
